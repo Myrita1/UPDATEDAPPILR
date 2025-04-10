@@ -1,8 +1,5 @@
-import streamlit as st
 from transformers import XLMRobertaForSequenceClassification, XLMRobertaTokenizer
-from googletrans import Translator
-import pandas as pd
-import torch  # Ensure torch is imported
+import torch
 
 # Set the page title
 st.set_page_config(page_title="ILR Language Assessment Tool", page_icon="🌍")
@@ -16,28 +13,18 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Load the tokenizer and model for ILR level prediction from Hugging Face Hub or local directory
-model_name = "xlm-roberta-base"  # Use the Hugging Face model for base
-fine_tuned_model_path = "huggingface/your_username/your_model_name"  # Use Hugging Face repo URL if hosted
-
-# Load tokenizer and model
-try:
-    tokenizer = XLMRobertaTokenizer.from_pretrained(fine_tuned_model_path)
-    model = XLMRobertaForSequenceClassification.from_pretrained(fine_tuned_model_path)
-except Exception as e:
-    st.error(f"Error loading model from Hugging Face: {e}")
+# Load the trained model and tokenizer for ILR level prediction
+model_name = "./xlm-roberta-ilr3-4"  # Path to your local fine-tuned model
+tokenizer = XLMRobertaTokenizer.from_pretrained(model_name)
+model = XLMRobertaForSequenceClassification.from_pretrained(model_name)
 
 # Function to predict the ILR level
 def predict_ilr_level(text):
-    try:
-        encodings = tokenizer(text, truncation=True, padding=True, max_length=512, return_tensors="pt")
-        with torch.no_grad():
-            outputs = model(**encodings)
-            predictions = torch.argmax(outputs.logits, dim=1)
-        return predictions.item()
-    except Exception as e:
-        st.error(f"Error during prediction: {e}")
-        return None
+    encodings = tokenizer(text, truncation=True, padding=True, max_length=512, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**encodings)
+        predictions = torch.argmax(outputs.logits, dim=1)
+    return predictions.item()
 
 # Function to translate text if it's not in English
 def translate_text(text, target_language="en"):
@@ -83,8 +70,7 @@ if st.button("Analyze"):
 
         # Predict ILR Level
         ilr_level = predict_ilr_level(translated_text)
-        if ilr_level is not None:
-            st.write(f"**Predicted ILR Level:** {ilr_level}")
+        st.write(f"**Predicted ILR Level:** {ilr_level}")
 
         # Extract Main Idea
         main_idea = extract_main_idea(translated_text)

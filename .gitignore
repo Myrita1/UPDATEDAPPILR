@@ -9,3 +9,6 @@ results/
 # Ignore Python bytecode files
 *.pyc
 __pycache__/
+
+# Ignore any other temporary files or large files
+*.zip

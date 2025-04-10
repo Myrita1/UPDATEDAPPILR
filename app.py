@@ -1,5 +1,8 @@
+import streamlit as st  # Import Streamlit
 from transformers import XLMRobertaForSequenceClassification, XLMRobertaTokenizer
-import torch
+from googletrans import Translator
+import pandas as pd
+import torch  # Ensure torch is imported
 
 # Set the page title
 st.set_page_config(page_title="ILR Language Assessment Tool", page_icon="🌍")
@@ -13,7 +16,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Load the trained model and tokenizer for ILR level prediction
+# Choose model (Hugging Face or local)
 model_name = "./xlm-roberta-ilr3-4"  # Path to your local fine-tuned model
 tokenizer = XLMRobertaTokenizer.from_pretrained(model_name)
 model = XLMRobertaForSequenceClassification.from_pretrained(model_name)
